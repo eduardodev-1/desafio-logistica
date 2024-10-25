@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -36,24 +37,21 @@ public class FileProcessor {
             Long userId = Long.parseLong(userIdStr);
             Long orderId = Long.parseLong(orderIdStr);
             Long productId = Long.parseLong(prodIdStr);
-            Float value = Float.parseFloat(valueStr);
-            LocalDate date = LocalDate.parse(dateStr, formatter);
+            BigDecimal value = new BigDecimal(valueStr);
 
-            // Criar ou obter User
-            User user = userMap.computeIfAbsent(userId, id -> new User(userId, userName));
+            LocalDate date = LocalDate.parse(dateStr, formatter);
 
             // Criar ou obter Order e adicionar Product
             Order order = orderMap.computeIfAbsent(orderId, id -> {
                 Order newOrder = new Order();
                 newOrder.setId(orderId);
                 newOrder.setDate(date);
-                newOrder.setUser(user);
+                newOrder.setUser(new User(userId, userName));
                 return newOrder;
             });
             order.addProduct(new Product(productId, value));
         }
         reader.close();
-        System.out.println(orderMap.values());
         return new FileData(new ArrayList<>(userMap.values()), new ArrayList<>(orderMap.values()));
     }
 }

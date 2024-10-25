@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnTransformer;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,8 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private Float total = 0.0f;
+    private Long oldId;
+    private BigDecimal total = BigDecimal.ZERO;
 
     private LocalDate date;
 
@@ -44,7 +45,7 @@ public class Order {
         this.id = id;
     }
 
-    public Float getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
@@ -67,7 +68,7 @@ public class Order {
 
     public void addProduct(Product product) {
         this.products.add(product);
-        this.total += product.getValue();
+        this.total = this.total.add(product.getValue());
         this.productsJson = convertProductsToJson();
     }
 
@@ -105,7 +106,6 @@ public class Order {
         }
     }
 
-    // Converte JSON de volta para lista de produtos
     private void convertJsonToProducts() {
         try {
             this.products = objectMapper.readValue(this.productsJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Product.class));
@@ -123,10 +123,9 @@ public class Order {
         }
     }
 
-    // Converte JSON de volta para lista de produtos
     private void convertJsonToUser() {
         try {
-            this.userJson = objectMapper.readValue(this.userJson, objectMapper.getTypeFactory().constructType(User.class));
+            this.user = objectMapper.readValue(this.userJson, objectMapper.getTypeFactory().constructType(User.class));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

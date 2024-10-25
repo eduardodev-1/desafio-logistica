@@ -19,7 +19,6 @@ public class SaveFileDataToDataBase {
     public String execute(MultipartFile file) throws IOException {
         FileData fileData = FileProcessor.processFile(file);
         fileDataRepository.save(fileData);
-        System.out.println(fileData);
         return "recebido com sucesso";
     }
 }
