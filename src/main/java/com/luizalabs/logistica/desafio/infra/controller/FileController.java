@@ -20,8 +20,8 @@ public class FileController {
     }
 
     @PostMapping("/file")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        String content = saveFileDataToDataBase.execute(file);
-        return ResponseEntity.ok(content);
+    public ResponseEntity<Void> uploadFile(@RequestParam("file") MultipartFile file) {
+        saveFileDataToDataBase.execute(file);
+        return ResponseEntity.ok().build();
     }
 }

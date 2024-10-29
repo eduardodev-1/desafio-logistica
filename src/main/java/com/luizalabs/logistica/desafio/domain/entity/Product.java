@@ -1,30 +1,31 @@
 package com.luizalabs.logistica.desafio.domain.entity;
 
+import java.math.BigDecimal;
+
 public class Product {
     private Long id;
-    private Float value;
+    private BigDecimal value;
 
     public Product() {
     }
-
-    public Product(Long id, Float value) {
+    public Product(Long id, BigDecimal value) {
         this.id = id;
         this.value = value;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Float getValue() {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public BigDecimal getValue() {
         return value;
     }
 
-    public void setValue(Float value) {
+    public void setValue(BigDecimal value) {
         this.value = value;
     }
 

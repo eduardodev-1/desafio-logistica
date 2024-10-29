@@ -1,59 +1,45 @@
 package com.luizalabs.logistica.desafio.domain.service;
 
-import com.luizalabs.logistica.desafio.domain.entity.FileData;
-import com.luizalabs.logistica.desafio.domain.entity.Order;
-import com.luizalabs.logistica.desafio.domain.entity.Product;
-import com.luizalabs.logistica.desafio.domain.entity.User;
+import com.luizalabs.logistica.desafio.domain.entity.*;
+import com.luizalabs.logistica.desafio.infra.exception.FailedToProcessFileException;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Service
 public class FileProcessor {
 
-    public static FileData processFile(MultipartFile file) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-        String line;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-
-        Map<Long, User> userMap = new HashMap<>();
-        Map<Long, Order> orderMap = new HashMap<>();
-
-        while ((line = reader.readLine()) != null) {
-            // Extrair os dados da linha com base nos índices fornecidos
-            String userIdStr = line.substring(0, 10).replaceFirst("^0+(?!$)", "");
-            String userName = line.substring(10, 55).trim();
-            String orderIdStr = line.substring(55, 65).replaceFirst("^0+(?!$)", "");
-            String prodIdStr = line.substring(65, 75).replaceFirst("^0+(?!$)", "");
-            String valueStr = line.substring(75, 87).trim();
-            String dateStr = line.substring(87, 95);
-            Long userId = Long.parseLong(userIdStr);
-            Long orderId = Long.parseLong(orderIdStr);
-            Long productId = Long.parseLong(prodIdStr);
-            Float value = Float.parseFloat(valueStr);
-            LocalDate date = LocalDate.parse(dateStr, formatter);
-
-            // Criar ou obter User
-            User user = userMap.computeIfAbsent(userId, id -> new User(userId, userName));
-
-            // Criar ou obter Order e adicionar Product
-            Order order = orderMap.computeIfAbsent(orderId, id -> {
-                Order newOrder = new Order();
-                newOrder.setId(orderId);
-                newOrder.setDate(date);
-                newOrder.setUser(user);
-                return newOrder;
+    public FileProcessorResult processFile(MultipartFile file) {
+        Map<Long, Order> orders = new ConcurrentHashMap<>();
+        Map<Long, User> users = new ConcurrentHashMap<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            reader.lines().parallel().forEach(line -> {
+                FileData data = FileData.FromLine(line);
+                User user = getOrCreateNewUser(users, data);
+                Order order = getOrCreateNewOrder(orders, user, data);
+                order.addProduct(new Product(data.getProductId(), data.getProductValue()));
             });
-            order.addProduct(new Product(productId, value));
+        } catch (IOException e) {
+            throw new FailedToProcessFileException(e.getMessage());
         }
-        reader.close();
-        System.out.println(orderMap.values());
-        return new FileData(new ArrayList<>(userMap.values()), new ArrayList<>(orderMap.values()));
+        return new FileProcessorResult(List.copyOf(orders.values()), List.copyOf(users.values()));
+    }
+
+    private User getOrCreateNewUser(Map<Long, User> users, FileData data) {
+        return users.computeIfAbsent(data.getUserId(), id ->
+                new User(data.getUserId(), data.getUserName())
+        );
+    }
+
+    private Order getOrCreateNewOrder(Map<Long, Order> orders, User user, FileData data) {
+        return orders.computeIfAbsent(data.getOrderId(), id ->
+                new Order(data.getOrderId(), data.getOrderDate(), user)
+        );
     }
 }
