@@ -40,6 +40,15 @@ sudo ./gradlew test
 ```
 
 ### Passo 3: Executar os endpoints
+
+# Postman
+1 - Abra o postman e em collections, clique em import
+![img_2.png](img_2.png)
+
+2 - Selecione o arquivo Logistica.postman_collection.json e clique em ok.
+![img_3.png](img_3.png)
+3 - Agora você terá acesso a todos os endpoints disponíveis
+![img_4.png](img_4.png)
 ## API Endpoints
 
 ### 1. Upload de Arquivo
