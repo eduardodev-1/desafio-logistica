@@ -17,4 +17,3 @@ public class GetOrderById {
         return orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
     }
 }
-//teste
