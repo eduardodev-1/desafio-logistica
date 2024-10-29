@@ -1,0 +1,138 @@
+{
+	"info": {
+		"_postman_id": "4cd61254-b108-479d-9e04-aedb074eeb6e",
+		"name": "Logistica",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10204226"
+	},
+	"item": [
+		{
+			"name": "Post file",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/eduar/OneDrive/Documentos/desafio tecnico luizalabs/data/data_1.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/api/file",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"file"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Orders",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/eduar/OneDrive/Documentos/desafio tecnico luizalabs/data/data_1.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/api/orders",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Orders By Id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/eduar/OneDrive/Documentos/desafio tecnico luizalabs/data/data_1.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/api/orders/1084",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"orders",
+						"1084"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Orders By User Id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/eduar/OneDrive/Documentos/desafio tecnico luizalabs/data/data_1.txt"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/api/orders/user/3",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"orders",
+						"user",
+						"3"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

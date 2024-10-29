@@ -1,6 +1,7 @@
 package com.luizalabs.logistica.desafio.domain.service;
 
 import com.luizalabs.logistica.desafio.domain.entity.*;
+import com.luizalabs.logistica.desafio.infra.exception.EmptyFileException;
 import com.luizalabs.logistica.desafio.infra.exception.FailedToProcessFileException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,9 @@ public class FileProcessor {
         Map<Long, Order> orders = new ConcurrentHashMap<>();
         Map<Long, User> users = new ConcurrentHashMap<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            if (reader.readLine() == null) {
+                throw new EmptyFileException(file.getOriginalFilename());
+            }
             reader.lines().parallel().forEach(line -> {
                 FileData data = FileData.FromLine(line);
                 User user = getOrCreateNewUser(users, data);
