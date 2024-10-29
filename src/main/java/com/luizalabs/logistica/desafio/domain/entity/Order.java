@@ -1,7 +1,11 @@
 package com.luizalabs.logistica.desafio.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.luizalabs.logistica.desafio.infra.exception.JsonConverterException;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnTransformer;
 
@@ -14,28 +18,30 @@ import java.util.List;
 @Table(name = "order", schema = "ecommerce")
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long oldId;
     private BigDecimal total = BigDecimal.ZERO;
-
     private LocalDate date;
 
     @Column(columnDefinition = "jsonb")
     @ColumnTransformer(write = "?::jsonb")
+    @JsonIgnore
     private String productsJson;
 
-    @Column(columnDefinition = "jsonb")
-    @ColumnTransformer(write = "?::jsonb")
-    private String userJson;
-
     @Transient
+    @JsonProperty
     private List<Product> products = new ArrayList<>();
 
-    @Transient
+    @ManyToOne
     private User user;
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    public Order() {
+    }
+
+    public Order(Long id, LocalDate date, User user) {
+        this.id = id;
+        this.date = date;
+        this.user = user;
+    }
 
     public Long getId() {
         return id;
@@ -49,6 +55,18 @@ public class Order {
         return total;
     }
 
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    public String getProductsJson() {
+        return productsJson;
+    }
+
+    public void setProductsJson(String productsJson) {
+        this.productsJson = productsJson;
+    }
+
     public LocalDate getDate() {
         return date;
     }
@@ -57,19 +75,26 @@ public class Order {
         this.date = date;
     }
 
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
+
     public User getUser() {
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
-        this.userJson = convertUserToJson();
     }
 
     public void addProduct(Product product) {
         this.products.add(product);
         this.total = this.total.add(product.getValue());
-        this.productsJson = convertProductsToJson();
+        this.productsJson = JsonConverter.convertProductsToJson(products);
     }
 
     @Override
@@ -79,6 +104,11 @@ public class Order {
 
         Order order = (Order) o;
         return id.equals(order.id);
+    }
+
+    @PostLoad
+    private void onPostLoad() {
+        this.products = JsonConverter.convertJsonToProducts(productsJson);
     }
 
     @Override
@@ -97,43 +127,36 @@ public class Order {
                 '}';
     }
 
-    private String convertProductsToJson() {
-        try {
-            return objectMapper.writeValueAsString(this.products);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+    private static class JsonConverter {
+        private static final ObjectMapper objectMapper;
 
-    private void convertJsonToProducts() {
-        try {
-            this.products = objectMapper.readValue(this.productsJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Product.class));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        static {
+            objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
         }
-    }
 
-    private String convertUserToJson() {
-        try {
-            return objectMapper.writeValueAsString(this.user);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
+        private static String convertProductsToJson(List<Product> products) {
+            try {
+                return objectMapper.writeValueAsString(products);
+            } catch (JsonProcessingException e) {
+                throw new JsonConverterException(e.getMessage());
+            }
         }
-    }
 
-    private void convertJsonToUser() {
-        try {
-            this.user = objectMapper.readValue(this.userJson, objectMapper.getTypeFactory().constructType(User.class));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        private static List<Product> convertJsonToProducts(String productsJson) {
+            try {
+                return objectMapper.readValue(productsJson, objectMapper.getTypeFactory().constructCollectionType(List.class, Product.class));
+            } catch (JsonProcessingException e) {
+                throw new JsonConverterException(e.getMessage());
+            }
         }
-    }
 
-    @PostLoad
-    private void onPostLoad() {
-        convertJsonToProducts();
-        convertJsonToUser();
+        private static String convertOrderToJson(Order order) {
+            try {
+                return objectMapper.writeValueAsString(order);
+            } catch (JsonProcessingException e) {
+                throw new JsonConverterException(e.getMessage());
+            }
+        }
     }
 }

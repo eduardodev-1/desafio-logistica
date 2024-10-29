@@ -8,18 +8,17 @@ public class Product {
 
     public Product() {
     }
-
     public Product(Long id, BigDecimal value) {
         this.id = id;
         this.value = value;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public BigDecimal getValue() {
