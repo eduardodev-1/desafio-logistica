@@ -199,3 +199,11 @@ Foi feito um workflow atraves do github actions:
 ![image](https://github.com/user-attachments/assets/f94c4b94-5bf8-4086-a34e-f45545ee7d95)
 ![image](https://github.com/user-attachments/assets/1104b50f-9789-4d91-8a71-1b47da449d37)
 ![image](https://github.com/user-attachments/assets/55d2c3d1-3bef-445e-86ae-49112d506df8)
+
+## O design da aplicação foi baseado em Clean Architecture com Domain Driven Design
+
+# Clean Architecture
+![image](https://github.com/user-attachments/assets/077c3df8-4067-4446-8fbc-909e8c74c72c)
+# Domain Driven Design
+![image](https://github.com/user-attachments/assets/d61b5d99-45e5-4837-8ef6-ac55d224eab5)
+
