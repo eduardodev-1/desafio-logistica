@@ -6,6 +6,9 @@ public class CustomErrorResponse {
     String description;
 
     public CustomErrorResponse(int value, String message, String description) {
+        this.value = value;
+        this.message = message;
+        this.description = description;
     }
 
     public int getValue() {
